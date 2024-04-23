@@ -21,6 +21,9 @@ func (h *UserHandler) HandlePostUser(c *fiber.Ctx) error {
     if err := c.BodyParser(&params); err != nil {
         return err
     }
+    if err := params.Validate(); err != nil {
+        return c.JSON(err)
+    }
     user, err := types.NewUserFromParams(params)
     if err != nil {
         return err
