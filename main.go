@@ -36,6 +36,8 @@ func main() {
     apiv1.Get("/users", userhandler.HandleGetUsers)
     apiv1.Post("/users", userhandler.HandlePostUser)
     apiv1.Get("/users/:id", userhandler.HandleGetUser)
+    apiv1.Put("/users/:id", userhandler.HandlePutUser)
+    apiv1.Delete("/users/:id", userhandler.HandleDeleteUser)
 
     app.Listen(":3000")
 }
