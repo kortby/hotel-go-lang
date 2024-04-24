@@ -12,7 +12,7 @@ import (
 )
 
 const dburi = "mongodb://localhost:27017"
-// const dbname = "hotel-reservation"
+const dbname = "hotel-reservation"
 // const userColl = "users"
 
 var config = fiber.Config{
@@ -26,7 +26,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-    userhandler := api.NewUserHandler(data.NewMongoUserStore(client))
+    userhandler := api.NewUserHandler(data.NewMongoUserStore(client, data.DBNAME))
 
     // listenAddr := flag.String("listenAddr", ":5000", "The listen address of the API server")
     // flag.Parse()

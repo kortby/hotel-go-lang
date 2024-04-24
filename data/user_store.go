@@ -12,7 +12,12 @@ import (
 
 const userColl = "users"
 
+type Dropper interface {
+	Drop(context.Context) error
+}
+
 type UserStore interface {
+	Dropper
 	GetUserByID(context.Context, string) (*types.User, error)
 	GetUsers(context.Context) ([]*types.User, error)
 	CreateUser(context.Context, *types.User) (*types.User, error)
@@ -26,10 +31,10 @@ type MongoUserStore struct {
 	coll *mongo.Collection
 }
 
-func NewMongoUserStore(client *mongo.Client) *MongoUserStore {
+func NewMongoUserStore(client *mongo.Client, dbname string) *MongoUserStore {
 	return &MongoUserStore{
 		client: client,
-		coll: client.Database(DBNAME).Collection(userColl),
+		coll: client.Database(dbname).Collection(userColl),
 	}
 }
 
@@ -66,10 +71,6 @@ func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*types.User, error) {
 	if err = cur.All(ctx, &users); err != nil {
 		return nil, err
 	}
-	// for _, result := range users {
-	// 	fmt.Println(result)
-	// 	users = append(users, result)
-	// }
 
 	return users, nil
 }
@@ -96,5 +97,12 @@ func (s *MongoUserStore) DeleteUser(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+
+func (s *MongoUserStore) Drop(ctx context.Context) error {
+	fmt.Println("---------- dropping user collection------")
+	// return s.coll.Drop(ctx)
 	return nil
 }
