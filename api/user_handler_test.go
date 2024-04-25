@@ -17,11 +17,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const (
-	testdburi = "mongodb://localhost:27017"
-	testdbname = "hotel-reservation-test"
-)
-
 type testdb struct {
 	data.UserStore
 }
@@ -33,13 +28,13 @@ func (tdb *testdb) teardown(t *testing.T) {
 }
 
 func setup(t *testing.T) *testdb {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(testdburi))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(data.TESTDBNAME))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return &testdb{
-		UserStore: data.NewMongoUserStore(client, testdbname),
+		UserStore: data.NewMongoUserStore(client, data.TESTDBNAME),
 	}
 }
 
@@ -76,12 +71,12 @@ func TestPostUser(t *testing.T) {
 	if user.FirstName != params.FirstName {
 		t.Errorf("expected firstname %s but got %s", params.FirstName, user.FirstName)
 	}
-	// if user.LastName != params.LastName {
-	// 	t.Errorf("expected firstname %s but got %s", params.LastName, user.LastName)
-	// }
-	// if user.Email != params.Email {
-	// 	t.Errorf("expected firstname %s but got %s", params.Email, user.Email)
-	// }
+	if user.LastName != params.LastName {
+		t.Errorf("expected firstname %s but got %s", params.LastName, user.LastName)
+	}
+	if user.Email != params.Email {
+		t.Errorf("expected firstname %s but got %s", params.Email, user.Email)
+	}
   
 	// Assertions
 	assert := assert.New(t)

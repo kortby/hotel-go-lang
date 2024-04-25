@@ -23,3 +23,14 @@ install
 ```
 go get github.com/gofiber/fiber/v2
 ```
+
+## Connect to Mongo
+```
+mongosh
+```
+
+run the commands 
+```
+use DATABASE-NAME
+show collections
+```
