@@ -28,16 +28,16 @@ func seedHotel(name string, location string, rating int) {
 	}
 	rooms := []types.Room{
 		{
-			Type: types.SeaSideRoomType,
-			BasePrice: 230.99,
+			Size: "Small",
+			Price: 230.99,
 		},
 		{
-			Type: types.SingleRoomType,
-			BasePrice: 49.99,
+			Size: "normal",
+			Price: 49.99,
 		},
 		{
-			Type: types.DeluxRoomType,
-			BasePrice: 149.99,
+			Size: "kingsize",
+			Price: 149.99,
 		},
 	}
 	insertedHotel, err := hotelStore.InsertHotel(ctx, &hotel)
