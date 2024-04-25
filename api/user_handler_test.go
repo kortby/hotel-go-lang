@@ -34,7 +34,7 @@ func setup(t *testing.T) *testdb {
 	}
 
 	return &testdb{
-		UserStore: data.NewMongoUserStore(client, data.TESTDBNAME),
+		UserStore: data.NewMongoUserStore(client),
 	}
 }
 

@@ -22,10 +22,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-    userhandler := api.NewUserHandler(data.NewMongoUserStore(client, data.DBNAME))
+    userStore := data.NewMongoUserStore(client)
     hotelStore := data.NewMongoHotelStore(client)
     roomStore := data.NewMongoRoomStore(client, hotelStore)
-    hotelhandler := api.NewHotelHandler(hotelStore, roomStore)
+    store := &data.Store{
+        Room: roomStore,
+        Hotel: hotelStore,
+        User: userStore,
+    }
+    userHandler := api.NewUserHandler(userStore)
+    hotelhandler := api.NewHotelHandler(store)
 
     // listenAddr := flag.String("listenAddr", ":5000", "The listen address of the API server")
     // flag.Parse()
@@ -33,14 +39,15 @@ func main() {
     apiv1 := app.Group("/api/v1") // /api
 
     // users
-    apiv1.Get("/users", userhandler.HandleGetUsers)
-    apiv1.Post("/users", userhandler.HandlePostUser)
-    apiv1.Get("/users/:id", userhandler.HandleGetUser)
-    apiv1.Put("/users/:id", userhandler.HandlePutUser)
-    apiv1.Delete("/users/:id", userhandler.HandleDeleteUser)
+    apiv1.Get("/users", userHandler.HandleGetUsers)
+    apiv1.Post("/users", userHandler.HandlePostUser)
+    apiv1.Get("/users/:id", userHandler.HandleGetUser)
+    apiv1.Put("/users/:id", userHandler.HandlePutUser)
+    apiv1.Delete("/users/:id", userHandler.HandleDeleteUser)
 
     // hotels
     apiv1.Get("/hotels", hotelhandler.HandleGetHotels)
+    apiv1.Get("/hotels/:id", hotelhandler.HandleGetHotel)
     apiv1.Get("/hotels/:id/rooms", hotelhandler.HandleGetRooms)
 
     app.Listen(":3000")

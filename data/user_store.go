@@ -3,7 +3,6 @@ package data
 import (
 	"context"
 	"fmt"
-
 	"github.com/kortbyhotel/reservation/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -31,10 +30,10 @@ type MongoUserStore struct {
 	coll *mongo.Collection
 }
 
-func NewMongoUserStore(client *mongo.Client, dbname string) *MongoUserStore {
+func NewMongoUserStore(client *mongo.Client) *MongoUserStore {
 	return &MongoUserStore{
 		client: client,
-		coll: client.Database(dbname).Collection(userColl),
+		coll: client.Database(DBNAME).Collection(userColl),
 	}
 }
 
