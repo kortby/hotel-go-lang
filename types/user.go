@@ -46,6 +46,9 @@ type User struct {
 	EncryptedPassword  string             `bson:"encryptedPassword" json:"-"`
 }
 
+func IsValidPassword(encpw, pw string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(encpw), []byte(pw)) == nil
+}
 
 // emailRegex is a regular expression for validating email addresses.
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
