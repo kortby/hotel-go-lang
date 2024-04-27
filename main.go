@@ -19,6 +19,8 @@ var config = fiber.Config{
 }
 
 func main() {
+    // 2024-04-26 18:22:44.016713 -0700 PDT m=+0.001678417
+    // 2024-04-26T18:22:44.0Z
     client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(data.DBURI))
 	if err != nil {
 		log.Fatal(err)
@@ -26,20 +28,23 @@ func main() {
     userStore := data.NewMongoUserStore(client)
     hotelStore := data.NewMongoHotelStore(client)
     roomStore := data.NewMongoRoomStore(client, hotelStore)
+    bookingStore := data.NewMongoBookingStore(client)
     store := &data.Store{
         Room: roomStore,
         Hotel: hotelStore,
         User: userStore,
+        Booking: bookingStore,
     }
     authHandler := api.NewAuthHandler(userStore)
     userHandler := api.NewUserHandler(userStore)
-    hotelhandler := api.NewHotelHandler(store)
+    hotelHandler := api.NewHotelHandler(store)
+    roomHandler := api.NewRoomHandler(store)
 
     // listenAddr := flag.String("listenAddr", ":5000", "The listen address of the API server")
     // flag.Parse()
     app := fiber.New(config)
     api := app.Group("/api") // /api
-    apiv1 := app.Group("/api/v1", middleware.JWTAuthentication) // /api
+    apiv1 := app.Group("/api/v1", middleware.JWTAuthentication(userStore)) // /api
 
     // auth
     api.Post("/auth", authHandler.HandleAuthenticate)
@@ -53,9 +58,13 @@ func main() {
     apiv1.Delete("/users/:id", userHandler.HandleDeleteUser)
 
     // hotels
-    apiv1.Get("/hotels", hotelhandler.HandleGetHotels)
-    apiv1.Get("/hotels/:id", hotelhandler.HandleGetHotel)
-    apiv1.Get("/hotels/:id/rooms", hotelhandler.HandleGetRooms)
+    apiv1.Get("/hotels", hotelHandler.HandleGetHotels)
+    apiv1.Get("/hotels/:id", hotelHandler.HandleGetHotel)
+    apiv1.Get("/hotels/:id/rooms", hotelHandler.HandleGetRooms)
+
+    // booking
+    apiv1.Get("/rooms", roomHandler.HandleGetRooms)
+    apiv1.Post("/rooms/:id/book", roomHandler.HandleBookRoom)
 
     app.Listen(":3000")
 }
