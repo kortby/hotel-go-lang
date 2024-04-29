@@ -20,7 +20,7 @@ var config = fiber.Config{
 
 func main() {
     // 2024-04-26 18:22:44.016713 -0700 PDT m=+0.001678417
-    // 2024-04-26T18:22:44.0Z
+    // 2024-04-26T18:22:44.0Z // 2025-04-07T00:00:00.0Z
     client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(data.DBURI))
 	if err != nil {
 		log.Fatal(err)
@@ -39,12 +39,14 @@ func main() {
     userHandler := api.NewUserHandler(userStore)
     hotelHandler := api.NewHotelHandler(store)
     roomHandler := api.NewRoomHandler(store)
+    bookingHandler := api.NewBookingHandler(store)
 
     // listenAddr := flag.String("listenAddr", ":5000", "The listen address of the API server")
     // flag.Parse()
     app := fiber.New(config)
     api := app.Group("/api") // /api
     apiv1 := app.Group("/api/v1", middleware.JWTAuthentication(userStore)) // /api
+    admin := apiv1.Group("/admin", middleware.AdminAuth) // /api
 
     // auth
     api.Post("/auth", authHandler.HandleAuthenticate)
@@ -65,6 +67,10 @@ func main() {
     // booking
     apiv1.Get("/rooms", roomHandler.HandleGetRooms)
     apiv1.Post("/rooms/:id/book", roomHandler.HandleBookRoom)
+
+    apiv1.Get("/bookings/:id", bookingHandler.HandleGetBooking)
+    // admin root booking handlers
+    admin.Get("/bookings", bookingHandler.HandleGetBookings)
 
     app.Listen(":3000")
 }

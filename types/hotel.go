@@ -12,14 +12,6 @@ type Hotel struct {
 
 type RoomType int
 
-const (
-	_ RoomType = iota
-	SingleRoomType
-	DoubleRoomType
-	SeaSideRoomType
-	DeluxRoomType
-)
-
 type Room struct {
 	ID 			primitive.ObjectID   `bson:"_id,omitempty" json:"id,omitempty"`
 	Seeside		bool				 `bson:"seaside" json:"seaside"`
