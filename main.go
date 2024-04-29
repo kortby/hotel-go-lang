@@ -19,8 +19,6 @@ var config = fiber.Config{
 }
 
 func main() {
-    // 2024-04-26 18:22:44.016713 -0700 PDT m=+0.001678417
-    // 2024-04-26T18:22:44.0Z // 2025-04-07T00:00:00.0Z
     client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(data.DBURI))
 	if err != nil {
 		log.Fatal(err)
