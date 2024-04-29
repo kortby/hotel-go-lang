@@ -1,4 +1,4 @@
-package api
+package tests
 
 import (
 	"bytes"
@@ -10,7 +10,9 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/kortbyhotel/reservation/api"
 	"github.com/kortbyhotel/reservation/data"
+	"github.com/kortbyhotel/reservation/data/fixtures"
 	"github.com/kortbyhotel/reservation/types"
 )
 
@@ -35,13 +37,14 @@ func TestAuthenticateSuccess(t *testing.T) {
 	tdb := setup(t)
 	defer tdb.teardown(t)
 
-	insertedUser := insertTestUser(t, tdb.UserStore)
+	insertedUser, _ := fixtures.AddUser(tdb.Store, "test", "test", false)
+
   
 	app := fiber.New()
-	authHandler := NewAuthHandler(tdb.UserStore)
+	authHandler := api.NewAuthHandler(tdb.User)
 	app.Post("/auth", authHandler.HandleAuthenticate)
 
-	params := AuthParams{
+	params := api.AuthParams{
 		Email: "test@test.com",
 		Password: "test1234",
 	}
@@ -58,7 +61,7 @@ func TestAuthenticateSuccess(t *testing.T) {
 		t.Fatalf("expected http status of 200, but got %d", resp.StatusCode)
 	}
 
-	var authResp AuthResponse
+	var authResp api.AuthResponse
 	if err := json.NewDecoder(resp.Body).Decode(&authResp); err != nil {
 		t.Error(err)
 	}
@@ -81,14 +84,15 @@ func TestAuthenticateNotSuccess(t *testing.T) {
     defer tdb.teardown(t)
 
     // Insert a test user
-    insertTestUser(t, tdb.UserStore)
+    // insertTestUser(t, tdb.User)
+	fixtures.AddUser(tdb.Store, "test", "test", false)
 
     app := fiber.New()
-    authHandler := NewAuthHandler(tdb.UserStore)
+    authHandler := api.NewAuthHandler(tdb.User)
     app.Post("/auth", authHandler.HandleAuthenticate)
 
     // Provide incorrect password parameters
-    params := AuthParams{
+    params := api.AuthParams{
         Email: "test@test.com",
         Password: "wrongpassword", // Intentionally incorrect
     }
