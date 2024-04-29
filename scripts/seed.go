@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/kortbyhotel/reservation/api"
 	"github.com/kortbyhotel/reservation/data"
 	"github.com/kortbyhotel/reservation/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -35,6 +36,11 @@ func seedUser(fname,lname, email string, isAdmin bool) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	usersTokens, err := api.CreateTokenFromUser(user)
+	if err != nil {
+		fmt.Printf("cannot create token")
+	}
+	fmt.Printf("%s -> %s\n", user.Email, usersTokens)
 }
 
 func seedHotel(name string, location string, rating int) {

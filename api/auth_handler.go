@@ -50,7 +50,7 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
         return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid credentials"})
     }
     
-    token, err := createTokenFromUser(user)
+    token, err := CreateTokenFromUser(user)
     if err != nil {
         return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create token"})
     }
@@ -62,7 +62,7 @@ func (h *AuthHandler) HandleAuthenticate(c *fiber.Ctx) error {
     return c.JSON(resp)
 }
 
-func createTokenFromUser(user *types.User) (string, error) {
+func CreateTokenFromUser(user *types.User) (string, error) {
     claims := jwt.MapClaims{
         "userID": user.ID.Hex(), // Assuming user.ID is an ObjectID
         "email": user.Email,
