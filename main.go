@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/kortbyhotel/reservation/api"
@@ -14,7 +15,10 @@ import (
 
 var config = fiber.Config{
     ErrorHandler: func(ctx *fiber.Ctx, err error) error {
-        return ctx.JSON(map[string]string{"error": err.Error()})
+        if apiError, ok := err.(api.Error); ok {
+            return ctx.Status(apiError.Code).JSON(apiError)
+        }
+        return api.NewError(http.StatusInternalServerError, err.Error())
     },
 }
 

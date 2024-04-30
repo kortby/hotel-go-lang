@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/kortbyhotel/reservation/api"
 	"github.com/kortbyhotel/reservation/data"
 )
 
@@ -16,13 +17,12 @@ func JWTAuthentication(userStore data.UserStore) fiber.Handler {
 
 		token := c.Get("X-Api-Token")
 		if token == "" {
-			fmt.Println("token not present in the header")
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
 		}
 	
 		claims, err := validateToken(token)
 		if err != nil {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid token"})
+			return api.ErrUnauthorized()
 		}
 	
 		expires := int64(claims["exp"].(float64))
@@ -33,13 +33,13 @@ func JWTAuthentication(userStore data.UserStore) fiber.Handler {
 		userID, ok := claims["userID"].(string)
 		if !ok || userID == "" {
 			fmt.Println("userID claim is missing or not a string")
-			return fmt.Errorf("unauthorized")
+			return api.ErrUnauthorized()
 		}
 
 		user, err := userStore.GetUserByID(c.Context(), userID)
 		if err != nil {
 			fmt.Println("error retrieving user:", err)
-			return fmt.Errorf("unauthorized")
+			return api.ErrUnauthorized()
 		}
 		c.Context().SetUserValue("user", user)
 		return c.Next()
@@ -61,14 +61,12 @@ func validateToken(tokenString string) (jwt.MapClaims, error) {
         return nil, fmt.Errorf("unauthorized - token parse error")
     }
     if !token.Valid {
-        fmt.Println("Invalid token")
-        return nil, fmt.Errorf("unauthorized")
+        return nil, api.ErrUnauthorized()
     }
 
     claims, ok := token.Claims.(*jwt.MapClaims)
     if !ok {
-        fmt.Println("Invalid claims structure")
-        return nil, fmt.Errorf("unauthorized")
+        return nil, api.ErrUnauthorized()
     }
 
     return *claims, nil

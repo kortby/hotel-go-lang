@@ -24,7 +24,7 @@ func NewUserHandler(userStore data.UserStore) *UserHandler {
 func (h *UserHandler) HandlePostUser(c *fiber.Ctx) error {
     var params types.CreateUserParams
     if err := c.BodyParser(&params); err != nil {
-        return err
+        return ErrBadRequest()
     }
     validationErrors := params.Validate()
     if len(validationErrors) > 0 {
@@ -49,10 +49,10 @@ func (h *UserHandler) HandlePutUser(c *fiber.Ctx) error {
     )
     oid, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
-		return err
+		return ErrInvalidID()
 	}
     if err := c.BodyParser(&params); err != nil {
-        return err
+        return ErrBadRequest()
     }
     filter := bson.M{"_id": oid}
     
@@ -69,7 +69,7 @@ func (h *UserHandler) HandleGetUser(c *fiber.Ctx) error {
     user, err := h.userStore.GetUserByID(c.Context(), id)
     if err != nil {
         if errors.Is(err, mongo.ErrNoDocuments) {
-            return c.JSON(map[string]string{"error": "not found"})
+            return ErrResourceFound("user")
         }
         return err
     }

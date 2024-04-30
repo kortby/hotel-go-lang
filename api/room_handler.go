@@ -26,7 +26,7 @@ type RoomHandler struct {
 func (h *RoomHandler) HandleGetRooms(c *fiber.Ctx) error {
 	rooms, err := h.store.Room.GetRooms(c.Context(), bson.M{})
 	if err != nil {
-		return err
+		return ErrResourceFound("room")
 	}
 
 	return c.JSON(rooms)
@@ -100,7 +100,7 @@ func (h *RoomHandler) isRoomAvailableForBooking(ctx context.Context,roomID primi
 	}
 	bookings, err := h.store.Booking.GetBookings(ctx, filter)
 	if err != nil {
-		return false, err
+		return false, ErrResourceFound("bookings")
 	} 
 
 	return len(bookings) == 0, nil

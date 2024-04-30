@@ -24,7 +24,7 @@ func (h *BookingHandler) HandleGetBookings(c *fiber.Ctx) error {
 
 	bookings, err := h.store.Booking.GetBookings(c.Context(), nil)
 	if err != nil {
-		return err
+		return ErrResourceFound("booking")
 	}
 	return c.JSON(bookings)
 }
@@ -38,7 +38,7 @@ func (h *BookingHandler) HandleGetBooking(c *fiber.Ctx) error {
 
 	booking, err := h.store.Booking.GetBookingByID(c.Context(), oid)
 	if err != nil {
-		return err
+		return ErrResourceFound("booking")
 	}
 	user, err := GetAuthUser(c)
 	if err != nil {
@@ -58,7 +58,7 @@ func (h *BookingHandler) HandleCancelBooking(c *fiber.Ctx) error {
 	}
 	booking, err := h.store.Booking.GetBookingByID(c.Context(), oid)
 	if err != nil {
-		return err
+		return ErrResourceFound("booking")
 	}
 	user, err := GetAuthUser(c)
 	if err != nil {
