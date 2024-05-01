@@ -8,12 +8,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/kortbyhotel/reservation/api"
 	"github.com/kortbyhotel/reservation/data"
+	"github.com/kortbyhotel/reservation/config"
 	"github.com/kortbyhotel/reservation/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+    _ "github.com/joho/godotenv/autoload"
 )
 
-var config = fiber.Config{
+var fiberConfig = fiber.Config{
     ErrorHandler: func(ctx *fiber.Ctx, err error) error {
         if apiError, ok := err.(api.Error); ok {
             return ctx.Status(apiError.Code).JSON(apiError)
@@ -23,7 +25,9 @@ var config = fiber.Config{
 }
 
 func main() {
-    client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(data.DBURI))
+    cfg := config.New()
+
+    client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(cfg.DBURI))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,7 +49,7 @@ func main() {
 
     // listenAddr := flag.String("listenAddr", ":5000", "The listen address of the API server")
     // flag.Parse()
-    app := fiber.New(config)
+    app := fiber.New(fiberConfig)
     api := app.Group("/api") // /api
     apiv1 := app.Group("/api/v1", middleware.JWTAuthentication(userStore)) // /api
     admin := apiv1.Group("/admin", middleware.AdminAuth) // /api

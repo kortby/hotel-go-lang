@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 
+	"github.com/kortbyhotel/reservation/config"
 	"github.com/kortbyhotel/reservation/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -24,7 +25,7 @@ type MongoRoomStore struct {
 func NewMongoRoomStore(client *mongo.Client, hotelStore HotelStore) *MongoRoomStore {
 	return &MongoRoomStore{
 		client: 	client,
-		coll: 		client.Database(DBNAME).Collection("rooms"),
+		coll: 		client.Database(config.New().DBNAME).Collection("rooms"),
 		HotelStore: hotelStore,
 	}
 }

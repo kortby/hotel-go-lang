@@ -1,11 +1,5 @@
 package data
 
-const (
-	DBNAME = "hotel-reservation"
-	TESTDBNAME = "hotel-reservation-test"
-	DBURI = "mongodb://localhost:27017"
-)
-
 type Pagination struct {
 	Limit int64
 	Page  int64

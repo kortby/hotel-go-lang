@@ -9,6 +9,7 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/kortbyhotel/reservation/api"
+	"github.com/kortbyhotel/reservation/config"
 	"github.com/kortbyhotel/reservation/data"
 	"github.com/kortbyhotel/reservation/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -93,11 +94,11 @@ func seedBooking(userID primitive.ObjectID, roomID primitive.ObjectID, from time
 
 func init() {
 	var err error
-	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(data.DBURI))
+	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(config.New().DBURI))
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := client.Database(data.DBNAME).Drop(ctx); err != nil {
+	if err := client.Database(config.New().TESTDBNAME).Drop(ctx); err != nil {
 		log.Fatal(err)
 	}
 	hotelStore = data.NewMongoHotelStore(client)
