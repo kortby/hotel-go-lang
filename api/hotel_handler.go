@@ -28,6 +28,11 @@ type ResourceResp struct {
 	Page 	int 	`json:"page"`
 }
 
+type HotelQuery struct {
+	data.Pagination
+	Rating	int
+}
+
 func (h *HotelHandler) HandleGetRooms(c *fiber.Ctx) error {
 	id := c.Params("id")
 	oid, err := primitive.ObjectIDFromHex(id)
@@ -45,18 +50,20 @@ func (h *HotelHandler) HandleGetRooms(c *fiber.Ctx) error {
 }
 
 func (h *HotelHandler) HandleGetHotels(c *fiber.Ctx) error {
-	var pagination data.Pagination
-	if err := c.QueryParser(&pagination); err != nil {
+	var params HotelQuery
+	if err := c.QueryParser(&params); err != nil {
 		return ErrBadRequest()
 	}
-	hotels, err := h.store.Hotel.GetHotels(c.Context(), nil, &pagination)
+	
+	filter := bson.M{"rating": params.Rating}
+	hotels, err := h.store.Hotel.GetHotels(c.Context(), filter, &params.Pagination)
 	if err != nil {
 		return ErrInvalidID()
 	}
 	resp := ResourceResp{
 		Results: len(hotels),
 		Data: hotels,
-		Page: int(pagination.Page),
+		Page: int(params.Page),
 	}
 	return c.JSON(resp)
 }

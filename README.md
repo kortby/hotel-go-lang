@@ -34,3 +34,13 @@ run the commands
 use DATABASE-NAME
 show collections
 ```
+
+Database Seeding 
+```
+make seed
+```
+
+Run the app
+```
+make run
+```
