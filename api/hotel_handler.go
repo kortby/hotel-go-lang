@@ -22,6 +22,12 @@ type HotelQueryPrams struct {
 	Rating int
 }
 
+type ResourceResp struct {
+	Results int 	`json:"resutls"`
+	Data 	any 	`json:"data"`
+	Page 	int 	`json:"page"`
+}
+
 func (h *HotelHandler) HandleGetRooms(c *fiber.Ctx) error {
 	id := c.Params("id")
 	oid, err := primitive.ObjectIDFromHex(id)
@@ -39,12 +45,20 @@ func (h *HotelHandler) HandleGetRooms(c *fiber.Ctx) error {
 }
 
 func (h *HotelHandler) HandleGetHotels(c *fiber.Ctx) error {
-
-	hotels, err := h.store.Hotel.GetHotels(c.Context(), nil)
+	var pagination data.Pagination
+	if err := c.QueryParser(&pagination); err != nil {
+		return ErrBadRequest()
+	}
+	hotels, err := h.store.Hotel.GetHotels(c.Context(), nil, &pagination)
 	if err != nil {
 		return ErrInvalidID()
 	}
-	return c.JSON(hotels)
+	resp := ResourceResp{
+		Results: len(hotels),
+		Data: hotels,
+		Page: int(pagination.Page),
+	}
+	return c.JSON(resp)
 }
 
 func (h *HotelHandler) HandleGetHotel(c *fiber.Ctx) error {

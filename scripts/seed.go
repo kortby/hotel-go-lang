@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/kortbyhotel/reservation/api"
 	"github.com/kortbyhotel/reservation/data"
 	"github.com/kortbyhotel/reservation/types"
@@ -109,11 +111,16 @@ func main() {
 
 	guest := seedUser("john", "Doe", "test@test.com", false)
 	seedUser("admin", "Admin", "admin@test.com", true)
-	seedHotel("Kortby INN", "Italy", 4)
-	seedHotel("Marriott", "Spain", 3)
 	hotel := seedHotel("Hyatt", "US", 5)
-	seedRoom("Large Room", false, 99, hotel.ID)
-	seedRoom("King Room", true, 199, hotel.ID)
 	room := seedRoom("Queen Room", false, 109, hotel.ID)
 	seedBooking(guest.ID, room.ID, time.Now(), time.Now().AddDate(0,0,2))
+
+	for i := 0; i < 500; i++ {
+		hotel := seedHotel(faker.Name(), faker.Century(), rand.Intn(5))
+		
+		for i := 0; i < 50; i++ {
+			price := rand.Intn(235)
+			seedRoom(faker.Name(), false, float64(price), hotel.ID)
+		}
+	}
 }
